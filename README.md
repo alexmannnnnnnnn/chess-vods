@@ -2,6 +2,8 @@
 
 Find the chess games you played against streamers, then watch them from the streamer's side of the stream.
 
+**Live site: [alexmannnnnnnnn.github.io/chess-vods](https://alexmannnnnnnnn.github.io/chess-vods/)**
+
 Like [pubg.report](https://pubg.report), but for chess: official game data from Chess.com and Lichess is matched against streamers' Twitch VODs, so every game links to the exact moment it started.
 
 ## How it works
