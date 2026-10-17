@@ -27,6 +27,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "data.json")
 LICHESS_SEEN = os.path.join(HERE, "data", "lichess_streamers.json")
 EXTRA = os.path.join(HERE, "streamers_extra.json")
+REMOVALS = os.path.join(HERE, "removals.json")   # people who asked to be taken off the site
 
 VOD_DAYS = int(os.environ.get("VOD_DAYS", "30"))     # how far back to look
 VODS_PER_STREAMER = 40                               # Twitch keeps ~7-60 days of VODs
@@ -300,6 +301,10 @@ def main():
     since = int(time.time()) - VOD_DAYS * 86400
 
     accounts = chesscom_streamers() + lichess_streamers() + extra_streamers()
+    removed = load_json(REMOVALS, {})
+    gone_players = {n.lower() for n in removed.get("players", [])}
+    gone_streamers = {n.lower() for n in removed.get("streamers", [])}
+    accounts = [a for a in accounts if a["twitch"] not in gone_streamers and a["username"] not in gone_streamers]
     uniq = {(a["platform"], a["username"]): a for a in accounts}
     accounts = list(uniq.values())
 
@@ -336,6 +341,13 @@ def main():
                                                    "avatar": users[a["twitch"]]["avatar"], "accounts": []})
             s["accounts"].append({"platform": a["platform"], "username": a["username"]})
 
+    before = len(games)
+    games = [g for g in games if (g.get("opponent") or "").lower() not in gone_players]
+    if before != len(games):
+        log(f"Hid {before - len(games)} games of players who asked to be removed")
+    # a streamer left with no games after removals drops out too
+    still = {g["streamer"] for g in games}
+    streamers = {k: v for k, v in streamers.items() if k in still}
     games.sort(key=lambda g: g["start"], reverse=True)
     save_json(OUT, {
         "generated": int(time.time()),

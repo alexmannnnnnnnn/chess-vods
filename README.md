@@ -43,6 +43,18 @@ python -m http.server 8000            # then open http://localhost:8000
 
 The Twitch player only works when the page is served from a web address (it won't play from a file opened directly).
 
+## Removal requests
+
+The footer's **Remove me** link opens a GitHub issue form. To approve a request, add the label
+**approved** to the issue. The "Process removal request" job then adds the name to `removals.json`,
+reruns the update, replies, and closes the issue. To remove someone by hand, edit `removals.json`:
+
+```json
+{ "players": ["their_username"], "streamers": ["their_twitch_or_chess_name"] }
+```
+
+Players lose the games they played against streamers; streamers lose their page and all their games.
+
 ## Settings
 
 - `VOD_DAYS` (environment variable, default 30): how far back to look. Twitch deletes VODs after 7–60 days depending on the channel.

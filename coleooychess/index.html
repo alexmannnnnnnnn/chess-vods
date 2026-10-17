@@ -107,6 +107,7 @@
   .about { max-width: 820px; margin: 8px auto 24px; color: var(--muted); font-size: 14px; text-align: center; }
   .about a { color: var(--accent); }
   footer { color: var(--muted); font-size: 12px; padding: 8px 0 32px; text-align: center; }
+  footer a { color: var(--muted); }
 
   .logo { width: 64px; height: 64px; display: grid; place-items: center; margin: 0 auto 14px;
     border-radius: 18px; background: var(--accent); color: var(--accent-ink); }
@@ -382,8 +383,10 @@
       $("sStreamers").textContent = d.streamers.length.toLocaleString();
       var mins = Math.max(1, Math.round((Date.now() / 1000 - d.generated) / 60));
       $("sUpdated").textContent = mins < 60 ? mins + " min ago" : Math.round(mins / 60) + " hr ago";
-      $("foot").textContent = "Data from the Chess.com and Lichess public APIs and Twitch · Updated " +
-        new Date(d.generated * 1000).toLocaleString() + " · Not affiliated with Chess.com, Lichess or Twitch";
+      $("foot").innerHTML = "Data from the Chess.com and Lichess public APIs and Twitch · Updated " +
+        esc(new Date(d.generated * 1000).toLocaleString()) + " · Not affiliated with Chess.com, Lichess or Twitch · " +
+        '<a href="https://github.com/alexmannnnnnnnn/chess-vods/issues/new?template=remove-me.yml" ' +
+        'target="_blank" rel="noopener">Remove me</a>';
       var q = new URLSearchParams(location.search).get("q") || "";
       if (!q && PRESET && byLogin[PRESET]) q = byLogin[PRESET].name;
       $("q").value = q;
