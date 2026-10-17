@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Played on Stream</title>
+<meta name="description" content="Find the chess games you played against streamers, and jump straight to that moment in their Twitch VOD.">
+<style>
+  :root {
+    --bg: #f3f1ea; --panel: #ffffff; --ink: #1b1d1a; --muted: #6a6e66; --line: #e1ddd2;
+    --accent: #3d6b40; --accent-ink: #ffffff; --chip: #ecebe4;
+    --win: #2f7a3a; --loss: #b2412f; --draw: #8a8577; --twitch: #9146ff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141613; --panel: #1d201c; --ink: #e8e6df; --muted: #9a9e93; --line: #2d312b;
+      --accent: #7fb07f; --accent-ink: #10130f; --chip: #272b25;
+      --win: #78c483; --loss: #e07a68; --draw: #a8a394; --twitch: #a970ff;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  a { color: inherit; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px; }
+  header { padding: 32px 0 6px; }
+  h1 { margin: 0; font: 700 30px/1.1 Georgia, "Times New Roman", serif; letter-spacing: -.01em; }
+  h1 .k { color: var(--accent); }
+  .tag { color: var(--muted); margin: 6px 0 0; max-width: 640px; }
+
+  .finder { margin: 18px 0 8px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .finder input, .finder select { padding: 11px 13px; font-size: 16px; color: var(--ink);
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px; outline: none; }
+  .finder input { flex: 1 1 260px; }
+  .finder input:focus, .finder select:focus { border-color: var(--accent); }
+  .finder button { padding: 11px 18px; font-size: 15px; font-weight: 600; border: 0; border-radius: 10px;
+    background: var(--accent); color: var(--accent-ink); cursor: pointer; }
+  .status { color: var(--muted); font-size: 13px; min-height: 20px; margin-bottom: 10px; }
+  .status b { color: var(--ink); }
+
+  main { display: grid; grid-template-columns: minmax(0, 1fr) 460px; gap: 20px; align-items: start; padding-bottom: 48px; }
+  @media (max-width: 920px) { main { grid-template-columns: 1fr; } .player { order: -1; position: static !important; } }
+
+  .player { position: sticky; top: 16px; background: var(--panel); border: 1px solid var(--line);
+    border-radius: 14px; overflow: hidden; }
+  .frame { aspect-ratio: 16/9; background: #0e0e10; display: grid; place-items: center; color: #9a9aa2;
+    font-size: 14px; text-align: center; padding: 0; }
+  .frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+  .now { padding: 11px 13px; font-size: 13px; color: var(--muted); }
+  .now a { color: var(--twitch); font-weight: 600; text-decoration: none; }
+
+  .list { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  .row { display: grid; grid-template-columns: 38px minmax(0, 1fr) auto; gap: 12px; align-items: center;
+    padding: 11px 14px; border-top: 1px solid var(--line); cursor: pointer; }
+  .row:first-child { border-top: 0; }
+  .row:hover, .row.active { background: var(--chip); }
+  .av { width: 38px; height: 38px; border-radius: 50%; background: var(--chip); object-fit: cover; }
+  .who { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .who .vs { color: var(--muted); font-weight: 400; }
+  .meta { color: var(--muted); font-size: 13px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .meta a { text-decoration: none; border-bottom: 1px dotted var(--muted); }
+  .res { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+    padding: 3px 9px; border-radius: 99px; background: var(--chip); }
+  .res.win { color: var(--win); } .res.loss { color: var(--loss); } .res.draw { color: var(--draw); }
+  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; vertical-align: 0;
+    border: 1px solid var(--muted); margin-right: 4px; }
+  .dot.white { background: #fff; } .dot.black { background: #222; }
+  .empty { padding: 28px 16px; color: var(--muted); text-align: center; }
+  .more { display: block; width: 100%; padding: 12px; border: 0; border-top: 1px solid var(--line);
+    background: transparent; color: var(--accent); font-weight: 600; cursor: pointer; font-size: 14px; }
+  footer { color: var(--muted); font-size: 12px; padding: 0 0 32px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Played <span class="k">on Stream</span></h1>
+    <p class="tag">Ever get paired against a streamer? Enter your Chess.com or Lichess username to find the game
+      and watch it from their side of the stream.</p>
+  </header>
+
+  <form class="finder" id="finder">
+    <input id="user" placeholder="Your Chess.com or Lichess username" autocomplete="off" spellcheck="false">
+    <select id="streamer"><option value="">All streamers</option></select>
+    <button type="submit">Find games</button>
+  </form>
+  <div class="status" id="status">Loading…</div>
+
+  <main>
+    <section class="list" id="list"></section>
+    <aside class="player">
+      <div class="frame" id="frame">Pick a game to watch it here</div>
+      <div class="now" id="now">&nbsp;</div>
+    </aside>
+  </main>
+  <footer id="foot"></footer>
+</div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var DATA = null, rows = [], shown = 0, PAGE = 60;
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function hms(sec) {
+    var h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s = sec % 60;
+    return h + "h" + m + "m" + s + "s";
+  }
+  function when(epoch) {
+    return new Date(epoch * 1000).toLocaleString(undefined,
+      { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+  }
+  function streamer(login) {
+    return DATA.streamers.find(function (s) { return s.twitch === login; }) || { name: login, avatar: "" };
+  }
+
+  function render(reset) {
+    var list = $("list");
+    if (reset) { shown = 0; list.innerHTML = ""; }
+    if (!rows.length) {
+      list.innerHTML = '<div class="empty">No games found.</div>';
+      return;
+    }
+    var chunk = rows.slice(shown, shown + PAGE);
+    var html = chunk.map(function (g, i) {
+      var s = streamer(g.streamer), idx = shown + i;
+      return '<div class="row" data-i="' + idx + '">' +
+        (s.avatar ? '<img class="av" alt="" loading="lazy" src="' + esc(s.avatar) + '" onerror="this.style.visibility=\'hidden\'">'
+                  : '<span class="av"></span>') +
+        '<div><div class="who">' + esc(s.name) + ' <span class="vs">vs</span> ' + esc(g.opponent) +
+          (g.opp_rating ? ' <span class="vs">(' + esc(g.opp_rating) + ')</span>' : "") + '</div>' +
+        '<div class="meta"><span><span class="dot ' + esc(g.color) + '"></span>' + esc(g.speed) + '</span>' +
+          '<span>' + esc(when(g.start)) + '</span>' +
+          '<a href="' + esc(g.url) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">' +
+            (g.platform === "lichess" ? "Lichess" : "Chess.com") + ' game</a></div></div>' +
+        '<span class="res ' + esc(g.result) + '">' + esc(g.result) + '</span></div>';
+    }).join("");
+    var old = list.querySelector(".more");
+    if (old) old.remove();
+    list.insertAdjacentHTML("beforeend", html);
+    shown += chunk.length;
+    if (shown < rows.length) {
+      list.insertAdjacentHTML("beforeend", '<button class="more" id="more">Show more (' +
+        (rows.length - shown) + ' left)</button>');
+    }
+  }
+
+  function apply() {
+    var user = $("user").value.trim().toLowerCase(), who = $("streamer").value;
+    rows = DATA.games.filter(function (g) {
+      return (!who || g.streamer === who) && (!user || (g.opponent || "").toLowerCase() === user);
+    });
+    var st = $("status");
+    if (user) {
+      var names = {};
+      rows.forEach(function (g) { names[streamer(g.streamer).name] = 1; });
+      var n = Object.keys(names).length;
+      st.innerHTML = rows.length
+        ? "<b>" + esc(user) + "</b> played " + rows.length + " game" + (rows.length > 1 ? "s" : "") +
+          " against " + n + " streamer" + (n > 1 ? "s" : "") + " on stream. Click one to watch."
+        : "No on-stream games found for <b>" + esc(user) + "</b> in the last " + DATA.days +
+          " days. Usernames must match exactly.";
+    } else {
+      st.textContent = rows.length.toLocaleString() + " on-stream games from " + DATA.streamers.length +
+        " streamers in the last " + DATA.days + " days";
+    }
+    render(true);
+    try {
+      var p = new URLSearchParams();
+      if (user) p.set("u", user);
+      if (who) p.set("s", who);
+      history.replaceState(null, "", p.toString() ? "?" + p : location.pathname);
+    } catch (e) {}
+  }
+
+  function play(g) {
+    var s = streamer(g.streamer);
+    var link = "https://www.twitch.tv/videos/" + g.vod + "?t=" + hms(g.t);
+    if (location.protocol === "file:" || !location.hostname) {
+      window.open(link, "_blank", "noopener");
+      $("frame").innerHTML = "Opened on Twitch in a new tab";
+    } else {
+      $("frame").innerHTML = '<iframe allowfullscreen allow="autoplay; fullscreen" src="https://player.twitch.tv/?video=v' +
+        encodeURIComponent(g.vod) + "&parent=" + encodeURIComponent(location.hostname) +
+        "&time=" + hms(g.t) + '&autoplay=true"></iframe>';
+    }
+    $("now").innerHTML = esc(s.name) + " vs " + esc(g.opponent) + " · " + esc(when(g.start)) +
+      ' · <a href="' + esc(link) + '" target="_blank" rel="noopener">Open on Twitch</a>';
+  }
+
+  $("list").addEventListener("click", function (e) {
+    if (e.target.id === "more") { render(false); return; }
+    var row = e.target.closest(".row");
+    if (!row) return;
+    document.querySelectorAll(".row.active").forEach(function (r) { r.classList.remove("active"); });
+    row.classList.add("active");
+    play(rows[+row.dataset.i]);
+  });
+  $("finder").addEventListener("submit", function (e) { e.preventDefault(); apply(); });
+  $("streamer").addEventListener("change", apply);
+
+  fetch("data.json", { cache: "no-cache" })
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function (d) {
+      DATA = d;
+      $("streamer").insertAdjacentHTML("beforeend", d.streamers.map(function (s) {
+        return '<option value="' + esc(s.twitch) + '">' + esc(s.name) + "</option>";
+      }).join(""));
+      var p = new URLSearchParams(location.search);
+      $("user").value = p.get("u") || "";
+      $("streamer").value = p.get("s") || "";
+      $("foot").textContent = "Data from the Chess.com and Lichess public APIs and Twitch. Updated " +
+        new Date(d.generated * 1000).toLocaleString() + ". Not affiliated with Chess.com, Lichess or Twitch.";
+      apply();
+    })
+    .catch(function () {
+      $("status").textContent = "No data yet. The first update runs shortly after setup.";
+    });
+})();
+</script>
+</body>
+</html>
