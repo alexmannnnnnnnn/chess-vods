@@ -69,6 +69,13 @@ def log(msg):
     print(msg, flush=True)
 
 
+def fail(msg):
+    """Stop with an error that also shows up as a GitHub Actions annotation."""
+    if os.environ.get("GITHUB_ACTIONS"):
+        print("::error::" + msg.replace("\n", " "), flush=True)
+    sys.exit(msg)
+
+
 def find_twitch(obj):
     """Return the first twitch login found anywhere inside a JSON value."""
     if isinstance(obj, str):
@@ -132,7 +139,7 @@ class Twitch:
                                        "grant_type": "client_credentials"}).encode()
         tok = http("https://id.twitch.tv/oauth2/token", data=body)
         if not tok or "access_token" not in tok:
-            sys.exit("Twitch rejected the Client ID / Secret. Double-check them.")
+            fail("Twitch rejected the Client ID / Secret. Double-check the TWITCH_CLIENT_ID and TWITCH_CLIENT_SECRET repository secrets.")
         self.h = {"Client-Id": client_id, "Authorization": "Bearer " + tok["access_token"]}
 
     def users(self, logins):
@@ -284,7 +291,7 @@ def credentials():
         cid = cid or input("  Client ID: ").strip()
         sec = sec or getpass.getpass("  Client Secret (hidden): ").strip()
     if not (cid and sec):
-        sys.exit("Missing TWITCH_CLIENT_ID / TWITCH_CLIENT_SECRET.")
+        fail("Missing TWITCH_CLIENT_ID / TWITCH_CLIENT_SECRET. Add them as repository secrets (Settings > Secrets and variables > Actions).")
     return cid, sec
 
 
@@ -340,4 +347,11 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except SystemExit:
+        raise
+    except Exception as e:  # make crashes readable in the Actions summary
+        import traceback
+        traceback.print_exc()
+        fail(f"{type(e).__name__}: {e}")
