@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://alexmannnnnnnnn.github.io/chess-vods/sitemap.xml

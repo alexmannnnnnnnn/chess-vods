@@ -3,7 +3,7 @@
 Chess VODs fetcher.
 
 Finds chess games that streamers played on stream and works out where each game
-starts inside the streamer's Twitch VOD. Writes docs/data.json for the website.
+starts inside the streamer's Twitch VOD. Writes data.json for the website.
 
 Sources (all official, no scraping):
   - Chess.com Published-Data API  (no key)  streamer list + games
@@ -24,7 +24,7 @@ import urllib.parse
 import urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT = os.path.join(HERE, "docs", "data.json")
+OUT = os.path.join(HERE, "data.json")
 LICHESS_SEEN = os.path.join(HERE, "data", "lichess_streamers.json")
 EXTRA = os.path.join(HERE, "streamers_extra.json")
 

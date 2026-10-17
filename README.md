@@ -10,8 +10,8 @@ Like [pubg.report](https://pubg.report), but for chess: official game data from 
   1. Gets the streamer lists from Chess.com and Lichess (each links a chess account to a Twitch channel).
   2. Gets each streamer's Twitch VODs from the last 30 days.
   3. Gets their games from the same period and keeps the ones played during a VOD.
-  4. Saves everything to `docs/data.json` and commits it.
-- GitHub Pages serves `docs/` as the website. Search runs in the browser, so there's no server to maintain.
+  4. Saves everything to `data.json`, then `build_pages.py` makes a page per streamer (e.g. `/witty_alien/`) plus `sitemap.xml`, and the job commits it all.
+- GitHub Pages serves the repo's top folder as the website. Search runs in the browser, so there's no server to maintain.
 
 Lichess only lists streamers while they're live, so the Lichess list grows over time as the job spots them (`data/lichess_streamers.json`).
 
@@ -20,7 +20,7 @@ Lichess only lists streamers while they're live, so the Lichess list grows over 
 1. **Twitch key:** at dev.twitch.tv/console, register an application (redirect URL `http://localhost`, category Website Integration, client type Confidential). Copy the Client ID and create a Client Secret.
 2. **Add the key to this repo:** Settings → Secrets and variables → Actions → New repository secret. Add `TWITCH_CLIENT_ID` and `TWITCH_CLIENT_SECRET`.
 3. **Run the first update:** Actions tab → "Update games" → Run workflow. The first run takes 10–30 minutes.
-4. **Website:** Settings → Pages shows the address (Source: Deploy from a branch, `main`, `/docs`).
+4. **Website:** Settings → Pages shows the address (Source: Deploy from a branch, `main`, `/ (root)`).
 
 ## Adding streamers by hand
 
@@ -37,7 +37,8 @@ Some streamers aren't in either official list. Add them to `streamers_extra.json
 
 ```
 python fetch.py                       # asks for the Twitch keys
-python -m http.server 8000 -d docs    # then open http://localhost:8000
+python build_pages.py
+python -m http.server 8000            # then open http://localhost:8000
 ```
 
 The Twitch player only works when the page is served from a web address (it won't play from a file opened directly).
@@ -45,6 +46,10 @@ The Twitch player only works when the page is served from a web address (it won'
 ## Settings
 
 - `VOD_DAYS` (environment variable, default 30): how far back to look. Twitch deletes VODs after 7–60 days depending on the channel.
+
+## Custom domain
+
+After connecting a domain in Settings → Pages, add a repository **variable** (not secret) named `SITE_URL`, e.g. `https://chessedonstream.com`, and add `SITE_URL: ${{ vars.SITE_URL }}` to the build step's env, so link previews and the sitemap use it.
 
 ## Limits
 
