@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Played on Stream</title>
+<title>Chessed on Stream</title>
 <meta name="description" content="Find the chess games you played against streamers, and jump straight to that moment in their Twitch VOD.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2224%22%20fill%3D%22%233d6b40%22/%3E%3Cg%20fill%3D%22%23fff%22%20transform%3D%22translate%286%203%29%20scale%28.88%29%22%3E%3Cpath%20d%3D%22M34%2074%20C33%2064%2035%2057%2040%2051%20L29%2053%20C23%2054%2018%2051%2015.5%2047%20C13%2043%2013.5%2038%2017%2035%20L31%2023%20L34%2011%20L42%2019.5%20C57%2020%2069%2031%2071%2048%20C72.5%2059%2071%2067%2068%2074%20Z%22/%3E%3Crect%20x%3D%2228%22%20y%3D%2276%22%20width%3D%2244%22%20height%3D%225%22%20rx%3D%222%22/%3E%3Cpath%20d%3D%22M22%2092%20V88%20C22%2085%2024%2083%2027%2083%20H73%20C76%2083%2078%2085%2078%2088%20V92%20Z%22/%3E%3C/g%3E%3Ccircle%20cx%3D%2233.3%22%20cy%3D%2231.2%22%20r%3D%222.3%22%20fill%3D%22%233d6b40%22/%3E%3C/svg%3E">
 <style>
@@ -30,7 +30,8 @@
   body.has-results .hero { padding: 24px 0 6px; }
   h1 { margin: 0; font: 700 44px/1.1 Georgia, "Times New Roman", serif; letter-spacing: -.015em; }
   body.has-results h1 { font-size: 26px; }
-  h1 .k { color: var(--accent); }
+  h1 .k { color: var(--accent); display: block; font-size: .5em; letter-spacing: .02em; margin-top: 4px; }
+  body.has-results h1 .k { display: inline; font-size: 1em; margin: 0; letter-spacing: 0; }
   h1 a { text-decoration: none; }
   .tag { color: var(--muted); margin: 8px auto 0; max-width: 560px; }
   body.has-results .tag { display: none; }
@@ -115,7 +116,7 @@
       <div class="logo" aria-hidden="true">
         <svg viewBox="8 6 84 90" fill="currentColor"><path d="M34 74 C33 64 35 57 40 51 L29 53 C23 54 18 51 15.5 47 C13 43 13.5 38 17 35 L31 23 L34 11 L42 19.5 C57 20 69 31 71 48 C72.5 59 71 67 68 74 Z"/><rect x="28" y="76" width="44" height="5" rx="2"/><path d="M22 92 V88 C22 85 24 83 27 83 H73 C76 83 78 85 78 88 V92 Z"/><circle cx="31" cy="32" r="2.6" fill="var(--accent)"/><path d="M44 26 C55 30 62 40 63 52" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round" opacity=".55"/></svg>
       </div>
-      <h1><a href="./">Played <span class="k">on Stream</span></a></h1>
+      <h1><a href="./">Chessed <span class="k">on Stream</span></a></h1>
     </div>
     <p class="tag">Did you play a chess streamer without knowing it? Find the game and watch it from their stream.</p>
     <form class="search" id="form" role="search">

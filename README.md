@@ -1,4 +1,4 @@
-# Played on Stream
+# Chessed on Stream
 
 Find the chess games you played against streamers, then watch them from the streamer's side of the stream.
 
