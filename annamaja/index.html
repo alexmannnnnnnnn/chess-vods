@@ -109,6 +109,17 @@
   .about a { color: var(--accent); }
   footer { color: var(--muted); font-size: 12px; padding: 8px 0 32px; text-align: center; }
   footer a { color: var(--muted); }
+  .support { max-width: 560px; margin: 28px auto 18px; padding: 18px 20px; text-align: center;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 14px; }
+  .support[hidden] { display: none; }
+  .support h2 { margin: 0 0 6px; font: 700 18px/1.2 Georgia, "Times New Roman", serif; }
+  .support p { margin: 0 auto 14px; color: var(--muted); font-size: 14px; max-width: 460px; }
+  .support .pay { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+  .support .pay a { display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: 99px;
+    font: 600 14px/1 system-ui, sans-serif; text-decoration: none; color: var(--ink);
+    background: var(--chip); border: 1px solid var(--line); }
+  .support .pay a:hover { border-color: var(--accent); }
+  .support .pay i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
 
   .logo { width: 64px; height: 64px; display: grid; place-items: center; margin: 0 auto 14px;
     border-radius: 18px; background: var(--accent); color: var(--accent-ink); }
@@ -179,6 +190,12 @@
     </aside>
   </main>
   <!--ABOUT--><p class="about">annamaja streams chess on <a href="https://www.twitch.tv/annamaja" rel="noopener">Twitch</a> and plays as annamaja on Chess.com. We found 17 of their games played on stream in the last 30 days. Played annamaja? Search your username above.</p><!--/ABOUT-->
+  <section class="support" id="support" hidden>
+    <h2>Support the site</h2>
+    <p>Chessed on Stream is free, has no ads, and is run by one person. If it helped you find a fun game,
+      a small tip keeps it running and pays for new features like YouTube streamers.</p>
+    <div class="pay" id="pay"></div>
+  </section>
   <footer id="foot"></footer>
 </div>
 
@@ -189,6 +206,8 @@
   var DATA = null, rows = [], shown = 0, PAGE = 60, byLogin = {}, mode = "";
   var FLIP = { win: "loss", loss: "win", draw: "draw" };
   var toggle = function () {};
+  // Donation handles: fill in to show the "Support the site" box (leave "" to hide one)
+  var SUPPORT = { venmo: "alexman2the9", paypal: "", cashapp: "" };
   var BASE = window.BASE || "", PRESET = window.PRESET || "", shareUrl = "", shareText = "";
   var ROOT = new URL(BASE || "./", location.href).href;
 
@@ -365,6 +384,19 @@
     else prompt("Copy this link:", shareUrl);
   });
   document.querySelector("h1 a").setAttribute("href", BASE || "./");
+  (function () {
+    var clean = function (h) { return String(h || "").trim().replace(/^[@$]/, ""); };
+    var ways = [
+      ["venmo", "Venmo", "#3d95ce", function (h) { return "https://venmo.com/u/" + encodeURIComponent(h); }],
+      ["paypal", "PayPal", "#0070ba", function (h) { return "https://paypal.me/" + encodeURIComponent(h); }],
+      ["cashapp", "Cash App", "#00d632", function (h) { return "https://cash.app/$" + encodeURIComponent(h); }]
+    ];
+    var html = ways.filter(function (w) { return clean(SUPPORT[w[0]]); }).map(function (w) {
+      return '<a href="' + esc(w[3](clean(SUPPORT[w[0]]))) + '" target="_blank" rel="noopener"><i style="background:' +
+        w[2] + '"></i>' + w[1] + '</a>';
+    }).join("");
+    if (html) { $("pay").innerHTML = html; $("support").hidden = false; }
+  })();
   var timer;
   $("q").addEventListener("input", function () {
     clearTimeout(timer);
