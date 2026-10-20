@@ -14,6 +14,7 @@ Standard library only, so it runs anywhere Python 3.9+ exists (including GitHub 
 """
 import datetime as dt
 import getpass
+from http.client import IncompleteRead
 import json
 import os
 import re
@@ -58,7 +59,8 @@ def http(url, headers=None, data=None, retries=4, raw=False):
                 continue
             log(f"  HTTP {e.code} for {url}")
             return None
-        except (urllib.error.URLError, TimeoutError) as e:
+        except (urllib.error.URLError, TimeoutError, IncompleteRead,
+                ConnectionError, json.JSONDecodeError) as e:
             if attempt < retries - 1:
                 time.sleep(5 * (attempt + 1))
                 continue
