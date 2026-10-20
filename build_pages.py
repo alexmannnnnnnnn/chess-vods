@@ -24,6 +24,15 @@ def site_url():
     """Public address of the site. Set SITE_URL when a custom domain is added."""
     url = os.environ.get("SITE_URL", "").strip()
     if not url:
+        # GitHub writes the custom domain into a CNAME file when one is set in Settings → Pages
+        try:
+            with open(os.path.join(HERE, "CNAME"), encoding="utf-8") as f:
+                domain = f.read().strip()
+            if domain:
+                url = "https://" + domain
+        except OSError:
+            pass
+    if not url:
         repo = os.environ.get("GITHUB_REPOSITORY", "alexmannnnnnnnn/chess-vods")
         owner, name = repo.split("/")
         url = f"https://{owner.lower()}.github.io/{name}"

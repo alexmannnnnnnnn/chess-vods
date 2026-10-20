@@ -63,7 +63,11 @@ Players lose the games they played against streamers; streamers lose their page 
 
 ## Custom domain
 
-After connecting a domain in Settings → Pages, add a repository **variable** (not secret) named `SITE_URL`, e.g. `https://chessedonstream.com`, and add `SITE_URL: ${{ vars.SITE_URL }}` to the build step's env, so link previews and the sitemap use it.
+The site is served at chessedonstream.com (bought at Cloudflare Registrar). Setup:
+
+1. Cloudflare → the domain → DNS → Records: four `A` records for `@` → `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`, and a `CNAME` `www` → `alexmannnnnnnnn.github.io`. Proxy status **DNS only** (grey cloud).
+2. GitHub → Settings → Pages → Custom domain → `chessedonstream.com` → Save, then tick **Enforce HTTPS** once it's offered. GitHub saves this as a `CNAME` file in the repo.
+3. `build_pages.py` reads that `CNAME` file, so link previews, streamer pages and the sitemap switch to the domain on the next update. (`SITE_URL` can still override it.)
 
 ## Limits
 
