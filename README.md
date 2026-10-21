@@ -2,7 +2,7 @@
 
 Find the chess games you played against streamers, then watch them from the streamer's side of the stream.
 
-**Live site: [alexmannnnnnnnn.github.io/chess-vods](https://alexmannnnnnnnn.github.io/chess-vods/)**
+**Live site: [chessedonstream.com](https://chessedonstream.com/)**
 
 Like [pubg.report](https://pubg.report), but for chess: official game data from Chess.com and Lichess is matched against streamers' Twitch VODs, so every game links to the exact moment it started.
 
@@ -45,6 +45,10 @@ python -m http.server 8000            # then open http://localhost:8000
 
 The Twitch player only works when the page is served from a web address (it won't play from a file opened directly).
 
+## Donations
+
+The "Support the site" box is set by the `SUPPORT` line in `index.html` (Ko-fi, Venmo, Cash App; leave a value "" to hide that button). The next update copies it to every streamer page.
+
 ## Removal requests
 
 The footer's **Remove me** link opens a GitHub issue form. To approve a request, add the label
@@ -63,7 +67,7 @@ Players lose the games they played against streamers; streamers lose their page 
 
 ## Custom domain
 
-The site is served at chessedonstream.com (bought at Cloudflare Registrar). Setup:
+The site is served at chessedonstream.com (bought at Cloudflare Registrar, Oct 2026). The old github.io address redirects to it. Setup:
 
 1. Cloudflare → the domain → DNS → Records: four `A` records for `@` → `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`, and a `CNAME` `www` → `alexmannnnnnnnn.github.io`. Proxy status **DNS only** (grey cloud).
 2. GitHub → Settings → Pages → Custom domain → `chessedonstream.com` → Save, then tick **Enforce HTTPS** once it's offered. GitHub saves this as a `CNAME` file in the repo.
