@@ -207,7 +207,7 @@
   var FLIP = { win: "loss", loss: "win", draw: "draw" };
   var toggle = function () {};
   // Donation handles: fill in to show the "Support the site" box (leave "" to hide one)
-  var SUPPORT = { venmo: "alexman2the9", paypal: "", cashapp: "abMannn" };
+  var SUPPORT = { kofi: "chessedonstream", venmo: "alexman2the9", paypal: "", cashapp: "abMannn" };
   var BASE = window.BASE || "", PRESET = window.PRESET || "", shareUrl = "", shareText = "";
   var ROOT = new URL(BASE || "./", location.href).href;
 
@@ -387,6 +387,7 @@
   (function () {
     var clean = function (h) { return String(h || "").trim().replace(/^[@$]/, ""); };
     var ways = [
+      ["kofi", "Ko-fi (card, Apple Pay)", "#ff5e5b", function (h) { return "https://ko-fi.com/" + encodeURIComponent(h); }],
       ["venmo", "Venmo", "#3d95ce", function (h) { return "https://venmo.com/u/" + encodeURIComponent(h); }],
       ["paypal", "PayPal", "#0070ba", function (h) { return "https://paypal.me/" + encodeURIComponent(h); }],
       ["cashapp", "Cash App", "#00d632", function (h) { return "https://cash.app/$" + encodeURIComponent(h); }]
